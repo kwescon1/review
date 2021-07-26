@@ -16,7 +16,9 @@ class Car extends Model
 
     protected $primaryKey = 'id';
 
-    protected $fillable = ['name', 'founded', 'description'];
+    protected $guarded = ['id'];
+
+    // protected $fillable = ['name', 'founded', 'description'];
 
     //used to hide certain data we dont want to show
     // the resource class can be used in place of the this hidden attribute
@@ -75,16 +77,16 @@ class Car extends Model
     //using cache to get data faster// cache is basically used to serve somewhat static data
     public static function cachedCars($cacheKey){
         
-        return self::returnRemember($cacheKey,Carbon::now()->addMinutes(20),self::allCars());
+        return self::rememberCache($cacheKey,Carbon::now()->addMinutes(20),self::allCars());
     }
 
     public static function cacheCar($cacheKey){
 
-        return self::returnRemember($cacheKey,Carbon::now()->addDay(),self::carSpecific(explode(".",$cacheKey)[1]));
+        return self::rememberCache($cacheKey,Carbon::now()->addDay(),self::carSpecific(explode(".",$cacheKey)[1]));
 
     }
 
-    public static function returnRemember($key,$expiry,$query){
+    public static function rememberCache($key,$expiry,$query){
         return cache()->remember($key,$expiry, function () use($query){
             return $query;
         });

@@ -50,9 +50,9 @@ class CarsController extends Core
     public function store(CreateCarValidationRequest $request)
     {
         //
-        $request->validated();
+        $data = $request->validated();
          
-        Car::create($request->all());
+        Car::create($data);
     
         $this->clearCache();
 
@@ -92,9 +92,9 @@ class CarsController extends Core
     public function update(CreateCarValidationRequest $request, Car $car)
     {
 
-        $request->validated();
+        $data = $request->validated();
         
-        $car->update($request->all());
+        $car->update($data);
 
         $this->clearCache();
         
