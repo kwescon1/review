@@ -26,7 +26,7 @@ class CreateCarValidationRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:20',
-            'founded' => "required|integer|min:0|max:Carbon::now()->year",
+            'founded' => 'required|integer|min:0|max:'. Carbon::now()->year,
             'description' => 'required|string'
         ];
     }
