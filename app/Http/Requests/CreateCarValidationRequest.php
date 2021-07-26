@@ -25,7 +25,7 @@ class CreateCarValidationRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:20',
+            'name' => 'required|string|max:20|unique:cars',
             'founded' => 'required|integer|min:0|max:'. Carbon::now()->year,
             'description' => 'required|string'
         ];

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 // use App\Models\Product;
+use App\Services\Core;
 use App\Http\Requests\CreateCarValidationRequest;
 
-class CarsController extends Controller
+class CarsController extends Core
 {
     //placing an authentication restriction on this conttoller except that index and show methods
     // public function __construct()
@@ -23,9 +24,10 @@ class CarsController extends Controller
     
     public function index()
     {
+        // return $this->getCacheKey("all");
         //SELECT * FROM cars
         // return view('cars.index',['cars' => Car::all()->makeVisible(['created_at','updated_at'])->toArray()]);
-        return view('cars.index',['cars' => Car::allCars()]);
+        return view('cars.index',['cars' => Car::cachedCars($this->getCacheKey("all"))]);
        
     }
 
@@ -50,11 +52,9 @@ class CarsController extends Controller
         //
         $request->validated();
          
-        Car::create([
-            'name' => $request->name,
-            'founded' => $request->founded,
-            'description' => $request->description
-        ]);
+        Car::create($request->all());
+    
+        $this->clearCache();
 
         return redirect('/cars');
     }
@@ -67,7 +67,7 @@ class CarsController extends Controller
      */
     public function show(Car $car)
     {
-        return view('cars.show')->with('car',$car);
+        return view('cars.show')->with('car',Car::cacheCar($this->getCacheKey($car->id)));
     }
 
     /**
@@ -94,12 +94,10 @@ class CarsController extends Controller
 
         $request->validated();
         
-        $car->update([
-            'name' => $request->name,
-            'founded' => $request->founded,
-            'description' => $request->description
-        ]);
+        $car->update($request->all());
 
+        $this->clearCache();
+        
         return redirect('/cars');
     }
 
@@ -113,6 +111,8 @@ class CarsController extends Controller
     {
 
         $car->delete();
+
+        $this->clearCache();
 
         return redirect('/cars');
     }

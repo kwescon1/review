@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Resources\CarResource;
+use Carbon\Carbon;
 
 
 class Car extends Model
@@ -63,6 +64,29 @@ class Car extends Model
 
     public static function allCars(){
         
-        return CarResource::collection(Car::all());
+        return CarResource::collection(self::all());
+    }
+
+    public static function carSpecific($id){
+        
+        return self::where('id',$id)->first();
+    }
+
+    //using cache to get data faster// cache is basically used to serve somewhat static data
+    public static function cachedCars($cacheKey){
+        
+        return self::returnRemember($cacheKey,Carbon::now()->addMinutes(20),self::allCars());
+    }
+
+    public static function cacheCar($cacheKey){
+
+        return self::returnRemember($cacheKey,Carbon::now()->addDay(),self::carSpecific(explode(".",$cacheKey)[1]));
+
+    }
+
+    public static function returnRemember($key,$expiry,$query){
+        return cache()->remember($key,$expiry, function () use($query){
+            return $query;
+        });
     }
 }
